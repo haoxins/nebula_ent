@@ -1,4 +1,4 @@
-module nebula-ent
+module github.com/haoxins/nebula-ent
 
 go 1.22
 

@@ -9,31 +9,26 @@ import (
 	nebula "github.com/vesoft-inc/nebula-go/v3"
 )
 
-const (
-	address = "127.0.0.1"
-	port    = 3699
-)
-
 func TestEntityBuilder(t *testing.T) {
 	spaceName := "test_space_entity_builder"
 	err := prepareSpace(spaceName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer dropSpace(spaceName)
 
-	hostAddress := nebula.HostAddress{Host: address, Port: port}
-	config, err := nebula.NewSessionPoolConf(
-		"root",
-		"nebula",
-		[]nebula.HostAddress{hostAddress},
-		spaceName)
+	hostAddr := nebula.HostAddress{Host: address, Port: port}
+	conf, err := nebula.NewSessionPoolConf(
+		username,
+		password,
+		[]nebula.HostAddress{hostAddr},
+		spaceName,
+	)
 	if err != nil {
 		t.Errorf("failed to create session pool config, %s", err.Error())
 	}
 
 	// create session pool
-	sessionPool, err := nebula.NewSessionPool(*config, nebula.DefaultLogger{})
+	sessionPool, err := nebula.NewSessionPool(*conf, nebula.DefaultLogger{})
 	if err != nil {
 		t.Fatal(err)
 	}
