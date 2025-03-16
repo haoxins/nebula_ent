@@ -13,14 +13,14 @@ jobs:
     strategy:
       matrix:
         goVer:
-        - 1.22.x
+        - 1.24.x
     steps:
     - uses: actions/checkout@v4
     - name: Setup go ${{ matrix.goVer }}
       uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.goVer }}
-    - name: go test
+    - name: Go test
       run: |
         docker-compose up -d
         sleep 10
