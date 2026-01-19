@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         goVer:
-        - 1.24.x
+        - 1.25.x
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup go ${{ matrix.goVer }}
       uses: actions/setup-go@v5
       with:
