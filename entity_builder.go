@@ -84,22 +84,33 @@ func (b *EntityBuilder) SetProp(name string, value any) *EntityBuilder {
 	return b
 }
 
-func (b *EntityBuilder) InsertVertex() *EntityBuilder {
-	panic("implement me")
-}
+func (b *EntityBuilder) InsertVertex(vid any) *EntityBuilder {
+	id, isIdStr := b.parseVid(vid)
 
-func (b *EntityBuilder) DeleteVertex(withEdge bool) *EntityBuilder {
-	panic("implement me")
-}
+	keys := []string{}
+	vals := []string{}
+	for _, p := range b.props {
+		keys = append(keys, p.name)
+		if p.isStr {
+			vals = append(vals, fmt.Sprintf(`"%s"`, p.value))
+		} else {
+			vals = append(vals, p.value)
+		}
+	}
 
-func (b *EntityBuilder) UpdateVertex() *EntityBuilder {
-	panic("implement me")
+	if isIdStr {
+		b.statement = fmt.Sprintf(`INSERT VERTEX %s (%s) VALUES "%s":(%s);`, b.name, strings.Join(keys, ", "), id, strings.Join(vals, ", "))
+	} else {
+		b.statement = fmt.Sprintf(`INSERT VERTEX %s (%s) VALUES %s:(%s);`, b.name, strings.Join(keys, ", "), id, strings.Join(vals, ", "))
+	}
+
+	return b
 }
 
 func (b *EntityBuilder) UpsertVertex(vid any) *EntityBuilder {
-	id, isStr := b.parseVid(vid)
+	id, isIdStr := b.parseVid(vid)
 	q := ""
-	if isStr {
+	if isIdStr {
 		q = fmt.Sprintf(`UPSERT VERTEX ON %s "%s"`, b.name, id)
 	} else {
 		q = fmt.Sprintf("UPSERT VERTEX ON %s %s", b.name, id)
@@ -122,16 +133,35 @@ func (b *EntityBuilder) UpsertVertex(vid any) *EntityBuilder {
 	return b
 }
 
-func (b *EntityBuilder) InsertEdge() *EntityBuilder {
+func (b *EntityBuilder) DeleteVertex(withEdge bool) *EntityBuilder {
 	panic("implement me")
 }
 
-func (b *EntityBuilder) DeleteEdge() *EntityBuilder {
+func (b *EntityBuilder) UpdateVertex() *EntityBuilder {
 	panic("implement me")
 }
 
-func (b *EntityBuilder) UpdateEdge() *EntityBuilder {
-	panic("implement me")
+func (b *EntityBuilder) InsertEdge(srcVid, dstVid any) *EntityBuilder {
+	src, dst, isStr := b.parseSrcAndDstVid(srcVid, dstVid)
+
+	keys := []string{}
+	vals := []string{}
+	for _, p := range b.props {
+		keys = append(keys, p.name)
+		if p.isStr {
+			vals = append(vals, fmt.Sprintf(`"%s"`, p.value))
+		} else {
+			vals = append(vals, p.value)
+		}
+	}
+
+	if isStr {
+		b.statement = fmt.Sprintf(`INSERT EDGE %s (%s) VALUES "%s" -> "%s":(%s);`, b.name, strings.Join(keys, ", "), src, dst, strings.Join(vals, ", "))
+	} else {
+		b.statement = fmt.Sprintf(`INSERT EDGE %s (%s) VALUES %s -> %s:(%s);`, b.name, strings.Join(keys, ", "), src, dst, strings.Join(vals, ", "))
+	}
+
+	return b
 }
 
 func (b *EntityBuilder) UpsertEdge(srcVid, dstVid any) *EntityBuilder {
@@ -159,6 +189,14 @@ func (b *EntityBuilder) UpsertEdge(srcVid, dstVid any) *EntityBuilder {
 	b.statement = q + ";"
 
 	return b
+}
+
+func (b *EntityBuilder) DeleteEdge() *EntityBuilder {
+	panic("implement me")
+}
+
+func (b *EntityBuilder) UpdateEdge() *EntityBuilder {
+	panic("implement me")
 }
 
 func (b *EntityBuilder) String() string {
