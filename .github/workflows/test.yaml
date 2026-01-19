@@ -22,10 +22,10 @@ jobs:
         go-version: ${{ matrix.goVer }}
     - name: Go test
       run: |
-        docker-compose up -d
+        docker compose up -d
         sleep 10
         go test -v ./...
     - name: down
       if: always()
       run: |
-        docker-compose down -v
+        docker compose down -v

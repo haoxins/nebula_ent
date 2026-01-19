@@ -28,7 +28,7 @@ func NewEntityBuilder(name string) *EntityBuilder {
 	}
 }
 
-func (b *EntityBuilder) SetProp(name string, value interface{}) *EntityBuilder {
+func (b *EntityBuilder) SetProp(name string, value any) *EntityBuilder {
 	t := reflect.TypeOf(value)
 	switch t.Kind() {
 	case reflect.String:
@@ -96,7 +96,7 @@ func (b *EntityBuilder) UpdateVertex() *EntityBuilder {
 	panic("implement me")
 }
 
-func (b *EntityBuilder) UpsertVertex(vid interface{}) *EntityBuilder {
+func (b *EntityBuilder) UpsertVertex(vid any) *EntityBuilder {
 	id, isStr := b.parseVid(vid)
 	q := ""
 	if isStr {
@@ -134,7 +134,7 @@ func (b *EntityBuilder) UpdateEdge() *EntityBuilder {
 	panic("implement me")
 }
 
-func (b *EntityBuilder) UpsertEdge(srcVid, dstVid interface{}) *EntityBuilder {
+func (b *EntityBuilder) UpsertEdge(srcVid, dstVid any) *EntityBuilder {
 	src, dst, isStr := b.parseSrcAndDstVid(srcVid, dstVid)
 
 	q := ""
@@ -173,7 +173,7 @@ func (b *EntityBuilder) escapeStrVal(s string) string {
 	return strings.ReplaceAll(s, `"`, `\"`)
 }
 
-func (b *EntityBuilder) parseVid(vid interface{}) (string, bool) {
+func (b *EntityBuilder) parseVid(vid any) (string, bool) {
 	t := reflect.TypeOf(vid)
 	switch t.Kind() {
 	case reflect.Int64:
@@ -185,7 +185,7 @@ func (b *EntityBuilder) parseVid(vid interface{}) (string, bool) {
 	}
 }
 
-func (b *EntityBuilder) parseSrcAndDstVid(srcVid, dstVid interface{}) (string, string, bool) {
+func (b *EntityBuilder) parseSrcAndDstVid(srcVid, dstVid any) (string, string, bool) {
 	tSrc := reflect.TypeOf(srcVid)
 	tDst := reflect.TypeOf(dstVid)
 	if tSrc.Kind() != tDst.Kind() {
