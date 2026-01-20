@@ -52,3 +52,28 @@ func prepareSpace(spaceName string) error {
 
 	return nil
 }
+
+func newSessionPool(spaceName string) (*nebula.SessionPool, error) {
+	err := prepareSpace(spaceName)
+	if err != nil {
+		return nil, err
+	}
+
+	hostAddr := nebula.HostAddress{Host: address, Port: port}
+	conf, err := nebula.NewSessionPoolConf(
+		username,
+		password,
+		[]nebula.HostAddress{hostAddr},
+		spaceName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	sessionPool, err := nebula.NewSessionPool(*conf, nebula.DefaultLogger{})
+	if err != nil {
+		return nil, err
+	}
+
+	return sessionPool, nil
+}
