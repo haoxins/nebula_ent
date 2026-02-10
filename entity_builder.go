@@ -208,7 +208,9 @@ func (b *EntityBuilder) Exec(pool *nebula.SessionPool) (*nebula.ResultSet, error
 }
 
 func (b *EntityBuilder) escapeStrVal(s string) string {
-	return strings.ReplaceAll(s, `"`, `\"`)
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	s = strings.ReplaceAll(s, "\n", "\\n")
+	return s
 }
 
 func (b *EntityBuilder) parseVid(vid any) (string, bool) {

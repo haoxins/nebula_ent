@@ -69,6 +69,14 @@ func TestUpsert(t *testing.T) {
 		Exec(sessionPool)
 	assert.Nil(t, err)
 
+	_, err = NewEntityBuilder("user").
+		SetProp("name", `Lily
+Double quotation"`).
+		SetProp("age", 20).
+		UpsertVertex("test2").
+		Exec(sessionPool)
+	assert.Nil(t, err)
+
 	now := time.Now().Unix()
 	b = NewEntityBuilder("friend").
 		SetProp("created_at", now).
@@ -120,6 +128,14 @@ func TestInsert(t *testing.T) {
 		Exec(sessionPool)
 	assert.Nil(t, err)
 
+	_, err = NewEntityBuilder("user").
+		SetProp("name", `Lily
+Double quotation"`).
+		SetProp("age", 20).
+		InsertVertex("test2").
+		Exec(sessionPool)
+	assert.Nil(t, err)
+
 	now := time.Now().Unix()
 	b = NewEntityBuilder("friend").
 		SetProp("created_at", now).
@@ -132,4 +148,29 @@ func TestInsert(t *testing.T) {
 	rs, err := sessionPool.ExecuteAndCheck(`FETCH PROP ON friend "test1" -> "test2" YIELD edge AS e;`)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(rs.GetRows()))
+}
+
+func Test_escapeStrVal(t *testing.T) {
+	b := &EntityBuilder{}
+
+	input := "No special characters here."
+	expected := "No special characters here."
+	result := b.escapeStrVal(input)
+	assert.Equal(t, expected, result)
+
+	input = `New line\n\t
+	and tab	characters.`
+	expected = "New line\\n\\t\\n\tand tab\tcharacters."
+	result = b.escapeStrVal(input)
+	assert.Equal(t, expected, result)
+
+	input = "New line\nand tab\tcharacters."
+	expected = "New line\\nand tab\tcharacters."
+	result = b.escapeStrVal(input)
+	assert.Equal(t, expected, result)
+
+	input = `He said, "Hello, World!"`
+	expected = `He said, \"Hello, World!\"`
+	result = b.escapeStrVal(input)
+	assert.Equal(t, expected, result)
 }
