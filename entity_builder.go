@@ -35,7 +35,7 @@ func (b *EntityBuilder) SetProp(name string, value any) *EntityBuilder {
 		b.props = append(b.props, _Prop{
 
 			name:  name,
-			value: b.escapeStrVal(value.(string)),
+			value: escapeStrVal(value.(string)),
 			isStr: true,
 		})
 	case reflect.Int64:
@@ -205,12 +205,6 @@ func (b *EntityBuilder) String() string {
 
 func (b *EntityBuilder) Exec(pool *nebula.SessionPool) (*nebula.ResultSet, error) {
 	return pool.ExecuteAndCheck(b.statement)
-}
-
-func (b *EntityBuilder) escapeStrVal(s string) string {
-	s = strings.ReplaceAll(s, `"`, `\"`)
-	s = strings.ReplaceAll(s, "\n", "\\n")
-	return s
 }
 
 func (b *EntityBuilder) parseVid(vid any) (string, bool) {
